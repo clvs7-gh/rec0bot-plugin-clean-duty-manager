@@ -99,10 +99,10 @@ const markDone = (isDone: boolean) => {
 };
 
 const sendList = async (channelId: string) => {
-    let talkString = `*Current : ${currentUser}*\n\n`;
+    let talkString = `*Current : ${currentUser.fullname} (${currentUser.username})*\n\n`;
     talkString += `${'-'.repeat(30)}\n\n`;
     talkString += users.map((u) => {
-        return `${u.fullname}(${u.username}): ${u.isDone ? 'done!' : 'not yet'}`;
+        return `${u.fullname} (${u.username}): ${u.isDone ? 'done!' : 'not yet'}`;
     }).join('\n');
     await mBot.sendTalk(channelId, talkString);
 };
