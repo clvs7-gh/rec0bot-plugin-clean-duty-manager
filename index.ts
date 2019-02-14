@@ -17,6 +17,8 @@ interface User {
 let users: User[] = [];
 let currentUser: User;
 
+const BRIDGE_PLUGIN_NAME = 'ldap-bridge';
+const BRIDGE_REQUEST_EVENT_NAME = 'sync-request';
 const DATA_DIR_NAME = 'data';
 const USERS_JSON_FILENAME = 'users.json';
 const NOTIFY_DEFAULT_CHANNEL_NAME = (process.env.REC0_ENV_CLEAN_NOTIFY_CHANNEL || '').trim() || 'general';
@@ -203,8 +205,11 @@ export const init = async (bot: BotProxy, options: { [key: string]: any }): Prom
     logger.info(`${metadata.name} plugin v${metadata.version} has been initialized.`);
 };
 
-export const onStart = () => {
+export const onStart = async () => {
     logger.debug('onStart()');
+    await mBot.firePluginEvent(BRIDGE_PLUGIN_NAME, BRIDGE_REQUEST_EVENT_NAME).catch(() => {
+        // Nop
+    });
 };
 
 export const onStop = async () => {
@@ -233,7 +238,7 @@ export const onMessage = async (message: string, channelId: string, userId: stri
 export const onPluginEvent = async (eventName: string, value?: any, fromId?: string) => {
     switch (eventName) {
         case 'sync-user':
-            if (value && Array.isArray(value)) {
+            if (value && Array.isArray(value) && value.length > 0) {
                 logger.info('Sync-user has been succeeded.');
                 logger.debug('New users: ', value);
                 users = value.map((entry) => {
@@ -244,6 +249,8 @@ export const onPluginEvent = async (eventName: string, value?: any, fromId?: str
                     await notify(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME), true);
                 }
                 await saveState();
+            } else {
+                logger.warn('Received empty users info!');
             }
             break;
         case 'scheduled:notify':
