@@ -1,6 +1,6 @@
 {
   "name": "clean-duty-manager",
-  "version": "1.0.0-beta1",
+  "version": "1.0.0",
   "description": "A plugin that manages duty of cleaning up.",
   "filter_prefixes": [
     "clean",

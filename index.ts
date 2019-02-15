@@ -154,6 +154,15 @@ const skip = async (channelId: string, isMarkDone = true) => {
     await notify(channelId, true);
 };
 
+const change = async (channelId: string, name: string) => {
+    const result = await selectNext(() => users.find((u) => u.username === name || u.fullname === name));
+    if (!result) {
+        await mBot.sendTalk(channelId, '部員、それは無効な選択です。変更に失敗しました。');
+        return;
+    }
+    await mBot.sendTalk(channelId, `コンピューター様のご厚意により、掃除当番は ${currentUser.fullname} さんに変更されました。働きに期待しています！`);
+};
+
 const zap = async (channelId: string, name: string) => {
     await _finish();
     const result = await selectNext(() => users.find((u) => u.username === name || u.fullname === name));
@@ -172,20 +181,23 @@ const handleSubCommand = async (cmds: string[], channelId: string, userId: strin
         case 'who':
             await mBot.sendTalk(channelId, `今週の幸福な当番は ${currentUser.fullname} さんです！`);
             break;
+        case 'change':
+            await change(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME), cmds[1] || '');
+            break;
         case 'zap':
-            await zap(channelId, cmds[1] || '');
+            await zap(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME), cmds[1] || '');
             break;
         case 'postpone':
-            await skip(channelId, false);
+            await skip(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME), false);
             break;
         case 'skip':
-            await skip(channelId);
+            await skip(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME));
             break;
         case 'list':
             await sendList(channelId);
             break;
         case 'fin':
-            await finish(channelId);
+            await finish(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME));
             break;
     }
 };
