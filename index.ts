@@ -21,7 +21,7 @@ const BRIDGE_PLUGIN_NAME = 'ldap-bridge';
 const BRIDGE_REQUEST_EVENT_NAME = 'sync-request';
 const DATA_DIR_NAME = 'data';
 const USERS_JSON_FILENAME = 'users.json';
-const NOTIFY_DEFAULT_CHANNEL_NAME = (process.env.REC0_ENV_CLEAN_NOTIFY_CHANNEL || '').trim() || 'general';
+const DEFAULT_NOTIFY_CHANNEL_NAME = (process.env.REC0_ENV_CLEAN_NOTIFY_CHANNEL || '').trim() || 'general';
 
 /**
  * Internal functions
@@ -182,22 +182,22 @@ const handleSubCommand = async (cmds: string[], channelId: string, userId: strin
             await mBot.sendTalk(channelId, `今週の幸福な当番は ${currentUser.fullname} さんです！`);
             break;
         case 'change':
-            await change(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME), cmds[1] || '');
+            await change(await mBot.getChannelId(DEFAULT_NOTIFY_CHANNEL_NAME), cmds[1] || '');
             break;
         case 'zap':
-            await zap(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME), cmds[1] || '');
+            await zap(await mBot.getChannelId(DEFAULT_NOTIFY_CHANNEL_NAME), cmds[1] || '');
             break;
         case 'postpone':
-            await skip(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME), false);
+            await skip(await mBot.getChannelId(DEFAULT_NOTIFY_CHANNEL_NAME), false);
             break;
         case 'skip':
-            await skip(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME));
+            await skip(await mBot.getChannelId(DEFAULT_NOTIFY_CHANNEL_NAME));
             break;
         case 'list':
             await sendList(channelId);
             break;
         case 'fin':
-            await finish(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME));
+            await finish(await mBot.getChannelId(DEFAULT_NOTIFY_CHANNEL_NAME));
             break;
     }
 };
@@ -237,7 +237,7 @@ export const onMessage = async (message: string, channelId: string, userId: stri
     const cmds = message.split(' ').map((m) => m.trim());
     switch (cmds[0]) {
         case '掃除完了':
-            await finish(channelId);
+            await finish(await mBot.getChannelId(DEFAULT_NOTIFY_CHANNEL_NAME));
             break;
         case 'clean':
             if (cmds.length > 1) {
@@ -258,7 +258,7 @@ export const onPluginEvent = async (eventName: string, value?: any, fromId?: str
                     return entry;
                 });
                 if (!currentUser && await selectNext()) {
-                    await notify(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME), true);
+                    await notify(await mBot.getChannelId(DEFAULT_NOTIFY_CHANNEL_NAME), true);
                 }
                 await saveState();
             } else {
@@ -269,7 +269,7 @@ export const onPluginEvent = async (eventName: string, value?: any, fromId?: str
             if (!isUserSynced()) {
                 return;
             }
-            await notify(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME), false);
+            await notify(await mBot.getChannelId(DEFAULT_NOTIFY_CHANNEL_NAME), false);
             break;
         case 'scheduled:select':
             if (!isUserSynced()) {
@@ -277,7 +277,7 @@ export const onPluginEvent = async (eventName: string, value?: any, fromId?: str
             }
             if (await selectNext()) {
                 await saveState();
-                await notify(await mBot.getChannelId(NOTIFY_DEFAULT_CHANNEL_NAME), true);
+                await notify(await mBot.getChannelId(DEFAULT_NOTIFY_CHANNEL_NAME), true);
             }
             break;
     }
