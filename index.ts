@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
 import { BotProxy } from './bot-proxy.interface';
+import { MessageContext } from './message-context.interface';
 
 let mBot: BotProxy;
 let logger: Logger;
@@ -229,9 +230,9 @@ export const onStop = async () => {
     await saveState();
 };
 
-export const onMessage = async (message: string, channelId: string, userId: string, data: { [key: string]: any }) => {
+export const onMessage = async (message: string, context: MessageContext, data: { [key: string]: any }) => {
     if (!isUserSynced()) {
-        await mBot.sendTalk(channelId, 'ユーザー同期の待機中です。しばらくお待ちください。');
+        await mBot.sendTalk(context.channelId, 'ユーザー同期の待機中です。しばらくお待ちください。');
         return;
     }
     const cmds = message.split(' ').map((m) => m.trim());
@@ -241,7 +242,7 @@ export const onMessage = async (message: string, channelId: string, userId: stri
             break;
         case 'clean':
             if (cmds.length > 1) {
-                await handleSubCommand(cmds.slice(1), channelId, userId, data);
+                await handleSubCommand(cmds.slice(1), context.channelId, context.userId, data);
             }
             break;
     }
