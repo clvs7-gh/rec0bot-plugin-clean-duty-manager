@@ -180,7 +180,11 @@ const zap = async (channelId: string, name: string) => {
 const handleSubCommand = async (cmds: string[], channelId: string, userId: string, data: { [key: string]: any }) => {
     switch (cmds[0]) {
         case 'who':
-            await mBot.sendTalk(channelId, `今週の幸福な当番は ${currentUser.fullname} さんです！`);
+            if (currentUser.isDone) {
+                await mBot.sendTalk(channelId, '今週の清掃は既に完了しています。ああ、なんと素晴らしい！');
+            } else {
+                await mBot.sendTalk(channelId, `今週の幸福な当番は ${currentUser.fullname} さんです！`);
+            }
             break;
         case 'change':
             await change(await mBot.getChannelId(DEFAULT_NOTIFY_CHANNEL_NAME), cmds[1] || '');
