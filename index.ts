@@ -255,7 +255,8 @@ export const onPluginEvent = async (eventName: string, value?: any, fromId?: str
                 logger.info('Sync-user has been succeeded.');
                 logger.debug('New users: ', value);
                 users = value.map((entry) => {
-                    entry['isDone'] = users[entry.username] ? users[entry.username].isDone : false;
+                    const user = users.find((u) => entry.username === u.username);
+                    entry['isDone'] = user ? user.isDone : false;
                     return entry;
                 });
                 if (!currentUser && await selectNext()) {
