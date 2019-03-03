@@ -93,9 +93,9 @@ const loadState = async () => {
 
 const markDone = (isDone: boolean) => {
     currentUser.isDone = isDone;
-    const user = users.find((u) => u.username === currentUser.username);
-    if (user) {
-        user.isDone = isDone;
+    const userIdx = users.findIndex((u) => u.username === currentUser.username);
+    if (userIdx >= 0) {
+        users[userIdx].isDone = isDone;
     }
 };
 
@@ -270,7 +270,9 @@ export const onPluginEvent = async (eventName: string, value?: any, fromId?: str
             if (!isUserSynced()) {
                 return;
             }
-            await notify(await mBot.getChannelId(DEFAULT_NOTIFY_CHANNEL_NAME), false);
+            if (!currentUser.isDone) {
+                await notify(await mBot.getChannelId(DEFAULT_NOTIFY_CHANNEL_NAME), false);
+            }
             break;
         case 'scheduled:select':
             if (!isUserSynced()) {
