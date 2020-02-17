@@ -12,7 +12,7 @@ Run `npm i && npm run build` to build.
 If you want to clean up built files, run `npm run clean`.
 
 ## Author
-clvs7 (Arisaka Mashiro)
+clvs7 (Arisaka Mayuki)
 
 ## Environment variables
 `REC0_ENV_CLEAN_NOTIFY_CHANNEL` : A channel name which rec0bot posts notification to.
